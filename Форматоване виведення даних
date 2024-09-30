@@ -1,44 +1,38 @@
+import java.text.MessageFormat;
 import java.util.Scanner;
 
-public class NumberInputExample {
+public class DataFormatting {
 
     public static void main(String[] args) {
-      
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("\nEnter an integer: ");
+        // Чтение данных пользователя
+        System.out.print("Enter an integer: ");
         int intValue = scanner.nextInt();
-
-        System.out.print("\nEnter a real number (double): ");
+        System.out.print("Enter a double: ");
         double doubleValue = scanner.nextDouble();
-        
-        System.out.print("\nEnter a boolean value (true/false): ");
+        System.out.print("Enter a string: ");
+        scanner.nextLine(); // Чистим буфер
+        String stringValue = scanner.nextLine();
+        System.out.print("Enter a boolean: ");
         boolean booleanValue = scanner.nextBoolean();
-        
-        scanner.nextLine();
 
-        System.out.print("\nEnter a string: ");
-        String inputString = scanner.nextLine();
+        // 1. Простой вывод с println
+        System.out.println("\n--- Simple Output ---");
+        System.out.println("Integer: " + intValue);
+        System.out.println("Double: " + doubleValue);
+        System.out.println("String: " + stringValue);
+        System.out.println("Boolean: " + booleanValue);
 
-        System.out.printf("Integer: %d, Double: %.2f, Boolean: %b, String: %s\n", intValue, doubleValue, booleanValue, inputString);
+        // 2. Форматированный вывод с printf
+        System.out.println("\n--- Formatted Output ---");
+        System.out.printf("Integer (hex): %x, Double (formatted): %.2f, String: %s, Boolean: %b\n", intValue, doubleValue, stringValue, booleanValue);
 
-        System.out.printf("Octal Integer: %o, Double: %.3f, Boolean: %b, String (10 chars): %.10s\n", intValue, doubleValue, booleanValue, inputString);
-
-        System.out.printf("Hex Integer: %x, Double: %.4f, Boolean: %b, String (5 chars): %.5s\n", intValue, doubleValue, booleanValue, inputString);
-
-        System.out.printf("Integer: %d, Double (5 decimals): %.5f, Boolean: %b, Full String: %s\n", intValue, doubleValue, booleanValue, inputString);
-
-        System.out.printf("Octal Integer: %o, Double: %.1f, Boolean: %b, String (8 chars): %.8s\n", intValue, doubleValue, booleanValue, inputString);
-
-        System.out.printf("Integer with sign: %+d, Double: %.2f, Boolean: %b, Full String: %s\n", intValue, doubleValue, booleanValue, inputString);
-
-        System.out.printf("Hex Integer: %x, Double: %.2f, Boolean: %b, String (15 chars): %.15s\n", intValue, doubleValue, booleanValue, inputString);
-
-        System.out.printf("Octal Integer: %o, Double: %.4f, Boolean: %b, String (6 chars): %.6s\n", intValue, doubleValue, booleanValue, inputString);
-
-        System.out.printf("Integer: %d, Double (3 decimals): %.3f, Boolean: %b, String (12 chars): %.12s\n", intValue, doubleValue, booleanValue, inputString);
-
-        System.out.printf("Integer: %d, Double: %.2f, Boolean: %b, Full String with message: Your input is '%s'\n", intValue, doubleValue, booleanValue, inputString);
+        // 3. Форматирование через MessageFormat.format
+        System.out.println("\n--- MessageFormat Output ---");
+        String template = "Integer: {0,number,#}, Double: {1,number,#.##}, String: {2}, Boolean: {3}";
+        String formattedMessage = MessageFormat.format(template, intValue, doubleValue, stringValue, booleanValue);
+        System.out.println(formattedMessage);
 
         scanner.close();
     }
