@@ -6,33 +6,48 @@ public class DataFormatting {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Чтение данных пользователя
         System.out.print("Enter an integer: ");
         int intValue = scanner.nextInt();
         System.out.print("Enter a double: ");
         double doubleValue = scanner.nextDouble();
+        scanner.nextLine();
         System.out.print("Enter a string: ");
-        scanner.nextLine(); // Чистим буфер
         String stringValue = scanner.nextLine();
-        System.out.print("Enter a boolean: ");
+        System.out.print("Enter a boolean (true/false): ");
         boolean booleanValue = scanner.nextBoolean();
 
-        // 1. Простой вывод с println
-        System.out.println("\n--- Simple Output ---");
-        System.out.println("Integer: " + intValue);
-        System.out.println("Double: " + doubleValue);
-        System.out.println("String: " + stringValue);
-        System.out.println("Boolean: " + booleanValue);
+        System.out.println("1:");
+        System.out.println(intValue + ", " + doubleValue + ", " + stringValue + ", " + booleanValue);
 
-        // 2. Форматированный вывод с printf
-        System.out.println("\n--- Formatted Output ---");
-        System.out.printf("Integer (hex): %x, Double (formatted): %.2f, String: %s, Boolean: %b\n", intValue, doubleValue, stringValue, booleanValue);
+        System.out.println("2:");
+        System.out.printf("%x, %e, %S, %b\n", intValue, doubleValue, stringValue, booleanValue);
 
-        // 3. Форматирование через MessageFormat.format
-        System.out.println("\n--- MessageFormat Output ---");
-        String template = "Integer: {0,number,#}, Double: {1,number,#.##}, String: {2}, Boolean: {3}";
-        String formattedMessage = MessageFormat.format(template, intValue, doubleValue, stringValue, booleanValue);
-        System.out.println(formattedMessage);
+        System.out.println("3:");
+        System.out.printf("%o, %.3f, %.5s, %b\n", intValue, doubleValue, stringValue, booleanValue);
+
+        System.out.println("4:");
+        String template = "{0}, {1}, {2}, {3}";
+        System.out.println(MessageFormat.format(template, intValue, doubleValue, stringValue, booleanValue));
+
+        System.out.println("5:");
+        System.out.printf("%s, %f, %s, %s\n", Integer.toBinaryString(intValue), doubleValue, stringValue, booleanValue ? "yes" : "no");
+
+        System.out.println("6:");
+        System.out.printf("%-10d %-10.2f %-10s %-5b\n", intValue, doubleValue, stringValue, booleanValue);
+
+        System.out.println("7:");
+        System.out.printf("%d, %.1f\n", intValue, doubleValue);
+
+        System.out.println("8:");
+        template = "{0,number,integer}, {1,number,#.##}";
+        System.out.println(MessageFormat.format(template, intValue, doubleValue));
+
+        System.out.println("9:");
+        template = "{2}, {2}";
+        System.out.println(MessageFormat.format(template, intValue, doubleValue, stringValue, booleanValue));
+
+        System.out.println("10:");
+        System.out.printf("%d, %.2f, %s, %s\n", intValue, doubleValue, stringValue, booleanValue ? "TRUE" : "FALSE");
 
         scanner.close();
     }
