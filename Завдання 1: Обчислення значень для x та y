@@ -1,0 +1,19 @@
+class CalculationXY {
+    public static void main(String[] args) {
+        // Введення значень δ, a, b та α
+        double delta = 0.8;
+        double a = 3;
+        double b = 1.5;
+        double alpha = 0.394;
+
+        // Обчислення x за формулою
+        double x = delta * Math.exp(Math.pow(b, 2)) * Math.sin(alpha);
+
+        // Обчислення y за формулою
+        double y = Math.sqrt(b * Math.pow(Math.cos(a), 2) + a);
+
+        // Виведення результатів
+        System.out.printf("Значення x: %.4f\n", x);
+        System.out.printf("Значення y: %.4f\n", y);
+    }
+}
