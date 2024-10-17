@@ -1,0 +1,29 @@
+public class FunctionFX {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Введення значень a, b
+        System.out.print("Введіть значення a: ");
+        double a = scanner.nextDouble();
+        System.out.print("Введіть значення b: ");
+        double b = scanner.nextDouble();
+
+        // Введення значення x
+        System.out.print("Введіть значення x: ");
+        double x = scanner.nextDouble();
+        double result = 0;
+
+        // Обчислення f(x) залежно від діапазону значення x
+        if (x >= 0 && x <= 2) {
+            result = Math.sin(x);
+        } else if (x == 2) {
+            result = 2 * Math.exp(a * x);
+        } else if (x > 2 && x < 8) {
+            result = 1 / (b * x + a);
+        }
+
+        // Виведення результату
+        System.out.printf("Значення f(x): %.4f\n", result);
+    }
+}
