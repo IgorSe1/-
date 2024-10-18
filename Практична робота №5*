@@ -1,0 +1,49 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Random;
+
+class Main {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Отримання кількості та діапазону чисел
+        System.out.print("Введіть кількість чисел: ");
+        int count = scanner.nextInt();
+
+        System.out.print("Введіть мінімальне значення: ");
+        int min = scanner.nextInt();
+
+        System.out.print("Введіть максимальне значення: ");
+        int max = scanner.nextInt();
+
+        // Створення списка ArrayList для зберігання випадкових чисел
+        ArrayList<Double> array = new ArrayList<Double>();
+        Random random = new Random();
+
+        // Генерування випадкових чисел та додавання до списку
+        for (int i = 0; i < count; i++) {
+            double randomValue = min + (max - min) * random.nextDouble();
+            array.add(randomValue);
+        }
+
+        // Підрахування середнього арифметичного числа
+        double sum = 0;
+        for (int i = 0; i < array.size(); i++) {
+            sum += array.get(i);
+        }
+        double averageArithmetic = sum / array.size();
+
+// Середнє геометричне число
+        double product = 1;
+        for (int i = 0; i < array.size(); i++) {
+            product *= array.get(i);
+        }
+        double averageGeometric = Math.pow(product, 1.0 / array.size());
+
+        // Вивід результатів
+        System.out.println("Згенеровані числа: " + array);
+        System.out.printf("Середнє арифметичне число: %.4f\n", averageArithmetic);
+        System.out.printf("Середнє геометричне число: %.4f\n", averageGeometric);
+    }
+}
