@@ -1,0 +1,39 @@
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Введення висоти піраміди
+        System.out.print("Введіть висоту піраміди: ");
+        int height = scanner.nextInt();
+
+        // Створення зубчастого пірамідального масиву
+        int[][] pyramid = new int[height][];
+        for (int i = 0; i < height; i++) {
+            pyramid[i] = new int[i + 1]; // Кожен ряд має на 1 елемент більше
+            for (int j = 0; j < pyramid[i].length; j++) {
+                pyramid[i][j] = (int) (Math.random() * 10); // Заповнюємо випадковими числами
+            }
+        }
+
+        // Виведення масиву у звичайному порядку
+        System.out.println("Піраміда у звичайному порядку:");
+        for (int i = 0; i < pyramid.length; i++) {
+            for (int j = 0; j < pyramid[i].length; j++) {
+                System.out.print(pyramid[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        // У зворотному
+        System.out.println("\nПіраміда у зворотному порядку:");
+        for (int i = pyramid.length - 1; i >= 0; i--) {
+            for (int j = 0; j < pyramid[i].length; j++) {
+                System.out.print(pyramid[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+}
