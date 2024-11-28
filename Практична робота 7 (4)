@@ -1,0 +1,65 @@
+import java.util.Scanner;
+import java.util.Random;
+
+public class Main {
+
+    // Метод для обчислення мінору
+    public static int calculateMinor(int[][] matrix, int rowToExclude, int colToExclude, int size) {
+        int[][] temp = new int[size - 1][size - 1]; // Допоміжна матриця
+        int i = 0, j = 0;
+
+        // Створення мінору шляхом виключення заданого рядка і стовпця
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (row != rowToExclude && col != colToExclude) {
+                    temp[i][j++] = matrix[row][col];
+                    if (j == size - 1) {
+                        j = 0;
+                        i++;
+                    }
+                }
+            }
+        }
+
+        // Обчислення визначника мінору для матриці розміром 2x2
+        return temp[0][0] * temp[1][1] - temp[0][1] * temp[1][0];
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Random random = new Random();
+
+        // Введення розміру матриці
+        System.out.print("Введіть розмір квадратної матриці (n x n): ");
+        int size = scanner.nextInt();
+
+        // Створення матриці
+        int[][] matrix = new int[size][size];
+        System.out.println("Згенерована матриця:");
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                matrix[i][j] = random.nextInt(10); // Випадкові числа від 0 до 9
+                System.out.printf("%4d", matrix[i][j]);
+            }
+            System.out.println();
+        }
+
+        // Введення показників для обчислення мінору
+        System.out.print("\nВведіть номер рядка для виключення (0-" + (size - 1) + "): ");
+        int rowToExclude = scanner.nextInt();
+
+        System.out.print("Введіть номер стовпця для виключення (0-" + (size - 1) + "): ");
+        int colToExclude = scanner.nextInt();
+
+        // Перевірка, чи обрана матриця достатнього розміру
+        if (size < 2) {
+            System.out.println("Для обчислення мінору розмір матриці має бути не менше 2x2.");
+        } else if (size == 2) {
+            System.out.println("Мінор дорівнює визначнику 2x2.");
+        } else {
+            // Обчислення мінору
+            int minor = calculateMinor(matrix, rowToExclude, colToExclude, size);
+            System.out.println("Мінор матриці: " + minor);
+        }
+    }
+}
