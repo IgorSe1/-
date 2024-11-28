@@ -1,0 +1,84 @@
+import java.util.Scanner;
+
+public class Main {
+
+    // Метод для обчислення визначника матриці рекурсивно
+    public static int calculateDeterminant(int[][] matrix, int n) {
+        int determinant = 0;
+
+        // Базовий випадок для матриці 1x1
+        if (n == 1) {
+            return matrix[0][0];
+        }
+
+        // Для матриці 2x2
+        if (n == 2) {
+            return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+        }
+
+        int[][] temp = new int[n][n]; // Допоміжна матриця
+        int sign = 1; // Знак мінору
+
+        // Проходится по кожному елементу першого рядка
+        for (int f = 0; f < n; f++) {
+            getCofactor(matrix, temp, 0, f, n); // Отримуємо мінор
+            determinant += sign * matrix[0][f] * calculateDeterminant(temp, n - 1); // Додає до визначника
+            sign = -sign; // Змінює знак
+        }
+
+        return determinant;
+    }
+
+    // Метод для отримання мінору матриці
+    public static void getCofactor(int[][] matrix, int[][] temp, int p, int q, int n) {
+        int i = 0, j = 0;
+
+        // Проходится по всіх елементах матриці
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                // Копіює лише ті елементи, що не належать до поточного рядка і стовпця
+                if (row != p && col != q) {
+                    temp[i][j++] = matrix[row][col];
+
+                    // Якщо рядок заповнено, переход до наступного
+                    if (j == n - 1) {
+                        j = 0;
+                        i++;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Створює матрицю 5x5
+        int[][] matrix = new int[5][5];
+
+        System.out.println("Введіть елементи матриці 5x5:");
+
+        // Заповнює матрицю з клавіатури
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                System.out.printf("Елемент [%d][%d]: ", i, j);
+                matrix[i][j] = scanner.nextInt();
+            }
+        }
+
+        // Виводить введену матрицю
+        System.out.println("\nВаша матриця:");
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                System.out.printf("%4d", matrix[i][j]);
+            }
+            System.out.println();
+        }
+
+        // Обчислює визначник
+        int determinant = calculateDeterminant(matrix, 5);
+
+        // Вивод результату
+        System.out.println("\nВизначник матриці: " + determinant);
+    }
+}
