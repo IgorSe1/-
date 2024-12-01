@@ -1,0 +1,76 @@
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Розмір матриці 5x5
+        int size = 5;
+        int[][] matrix = new int[size][size];
+
+        //
+        System.out.println("Введіть елементи матриці розміром 5x5:");
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                System.out.print("Элемент [" + (i + 1) + "][" + (j + 1) + "]: ");
+                matrix[i][j] = scanner.nextInt();
+            }
+        }
+
+        // Виведення матриці
+        System.out.println("Введена матриця:");
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                System.out.print(matrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        // Розрахунок визначника
+        int determinant = calculateDeterminant(matrix);
+        System.out.println("Визначник матриці: " + determinant);
+    }
+
+    // Метод для обчислення визначника
+    public static int calculateDeterminant(int[][] matrix) {
+        int size = matrix.length;
+
+        // Базовий випадок для матриці 1x1
+        if (size == 1) {
+            return matrix[0][0];
+        }
+
+        // Базовий випадок для матриці 2x2
+        if (size == 2) {
+            return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+        }
+
+        int determinant = 0;
+
+        // Обчислення визначника рекурсивне для великих матриць
+        for (int col = 0; col < size; col++) {
+            int[][] subMatrix = createSubMatrix(matrix, col);
+            determinant += (int) (Math.pow(-1, col) * matrix[0][col] * calculateDeterminant(subMatrix));
+        }
+
+        return determinant;
+    }
+
+    // Метод для створення мінорної матриці
+    private static int[][] createSubMatrix(int[][] matrix, int excludeCol) {
+        int size = matrix.length;
+        int[][] subMatrix = new int[size - 1][size - 1];
+
+        for (int i = 1; i < size; i++) { // Пропуск першого ряду
+            int subColIndex = 0;
+            for (int j = 0; j < size; j++) {
+                if (j == excludeCol) continue; // Пропуск виключеного стовпця
+                subMatrix[i - 1][subColIndex] = matrix[i][j];
+                subColIndex++;
+            }
+        }
+
+        return subMatrix;
+    }
+}
