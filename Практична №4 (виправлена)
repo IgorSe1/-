@@ -1,0 +1,68 @@
+import java.util.Scanner;
+import java.util.Random;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Random random = new Random();
+
+        // Ввод розміру матриці
+        System.out.print("Введіть розмір квадратної матриці (n x n): ");
+        int size = scanner.nextInt();
+
+        // Створення матриці
+        int[][] matrix = new int[size][size];
+        System.out.println("\nЗгенерована матриця:");
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                matrix[i][j] = random.nextInt(10); // Випадкові числа від 0 до 9
+                System.out.printf("%4d", matrix[i][j]);
+            }
+            System.out.println();
+        }
+
+        // Введення рядка та стовпця для обчислення мінора
+        System.out.print("\nВведіть номер рядка для мінору (1-" + size + "): ");
+        int rowToExclude = scanner.nextInt() - 1; // Індексація з 0
+        System.out.print("Введіть номер стовпця для мінору (1-" + size + "): ");
+        int colToExclude = scanner.nextInt() - 1; // Індексація з 0
+
+        // Перевірка введених індексів
+        if (rowToExclude < 0 || rowToExclude >= size || colToExclude < 0 || colToExclude >= size) {
+            System.out.println("Невірні індекси рядка або стовпця.");
+            return;
+        }
+
+        // Обчислення мінора
+        int[][] minor = getMinor(matrix, rowToExclude, colToExclude);
+
+        // Виведення мінора
+        System.out.println("\nМінор матриці:");
+        for (int i = 0; i < minor.length; i++) {
+            for (int j = 0; j < minor[i].length; j++) {
+                System.out.printf("%4d", minor[i][j]);
+            }
+            System.out.println();
+        }
+    }
+
+    // Метод для отримання мінора
+    public static int[][] getMinor(int[][] matrix, int excludedRow, int excludedCol) {
+        int size = matrix.length;
+        int[][] minor = new int[size - 1][size - 1];
+        int minorRow = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (i == excludedRow) continue;
+            int minorCol = 0;
+            for (int j = 0; j < size; j++) {
+                if (j == excludedCol) continue; 
+                minor[minorRow][minorCol] = matrix[i][j];
+                minorCol++;
+            }
+            minorRow++;
+        }
+
+        return minor;
+    }
+}
