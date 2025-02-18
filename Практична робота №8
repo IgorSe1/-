@@ -18,7 +18,7 @@ public class Main {
                     break;
                 }
             } else {
-                scanner.next(); // очищаем ввод
+                scanner.next();
             }
             System.out.println("Невірний вібір, введіть ще раз");
         }
@@ -35,34 +35,58 @@ public class Main {
     public static String getValidString(Scanner scanner) {
         while (true) {
             String input = scanner.nextLine().trim();
-            String[] words = input.split("\\s+");
-            if (words.length >= 2) {
-                boolean valid = true;
-                for (String word : words) {
-                    if (word.length() < 3) {
-                        valid = false;
+            int wordCount = 0;
+            int wordLength = 0;
+            boolean inWord = false;
+            for (char c : input.toCharArray()) {
+                if (c != ' ') {
+                    wordLength++;
+                    if (!inWord) {
+                        wordCount++;
+                        inWord = true;
+                    }
+                } else {
+                    if (inWord && wordLength < 3) {
+                        wordCount = 0;
                         break;
                     }
-                }
-                if (valid) {
-                    return input;
+                    wordLength = 0;
+                    inWord = false;
                 }
             }
-            System.out.println("Рядок має містити мінімум 2 слова, мінімум з 3 символів.\nВведіть ще раз: ");
+            if (wordCount >= 2 && wordLength >= 3) {
+                return input;
+            }
+            System.out.println("Введіть рядок (мінімум 2 слова через пробіл, з мінімум 3 символів).\nВведіть ще раз: ");
         }
     }
 
     public static String reverseString(String str) {
-        StringBuilder sb = new StringBuilder(str);
-        return sb.reverse().toString();
+        char[] chars = new char[str.length()];
+        for (int i = 0; i < str.length(); i++) {
+            chars[i] = str.charAt(str.length() - 1 - i);
+        }
+        return new String(chars);
     }
 
     public static String reverseEachWord(String str) {
-        String[] words = str.split("\\s+");
         StringBuilder result = new StringBuilder();
-        for (String word : words) {
-            result.append(new StringBuilder(word).reverse()).append(" ");
+        StringBuilder word = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (c == ' ') {
+                for (int j = word.length() - 1; j >= 0; j--) {
+                    result.append(word.charAt(j));
+                }
+                result.append(" ");
+                word.setLength(0);
+            } else {
+                word.append(c);
+            }
         }
-        return result.toString().trim();
+        for (int j = word.length() - 1; j >= 0; j--) {
+            result.append(word.charAt(j));
+        }
+        return result.toString();
     }
 }
