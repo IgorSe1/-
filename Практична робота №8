@@ -1,0 +1,68 @@
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введіть рядок (мінімум 2 слова через пробіл, з мінімум 3 символів):");
+        String input = getValidString(scanner);
+
+        int choice;
+        while (true) {
+            System.out.println("Оберіть функцію: ");
+            System.out.println("1) Перевернути весь рядок");
+            System.out.println("2) Перевернути кожне слово окремо");
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+                if (choice == 1 || choice == 2) {
+                    break;
+                }
+            } else {
+                scanner.next(); // очищаем ввод
+            }
+            System.out.println("Невірний вібір, введіть ще раз");
+        }
+
+        if (choice == 1) {
+            System.out.println("Результат перевернення всього рядка: " + reverseString(input));
+        } else {
+            System.out.println("Результат перевернення кожного слова: " + reverseEachWord(input));
+        }
+
+        scanner.close();
+    }
+
+    public static String getValidString(Scanner scanner) {
+        while (true) {
+            String input = scanner.nextLine().trim();
+            String[] words = input.split("\\s+");
+            if (words.length >= 2) {
+                boolean valid = true;
+                for (String word : words) {
+                    if (word.length() < 3) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid) {
+                    return input;
+                }
+            }
+            System.out.println("Рядок має містити мінімум 2 слова, мінімум з 3 символів.\nВведіть ще раз: ");
+        }
+    }
+
+    public static String reverseString(String str) {
+        StringBuilder sb = new StringBuilder(str);
+        return sb.reverse().toString();
+    }
+
+    public static String reverseEachWord(String str) {
+        String[] words = str.split("\\s+");
+        StringBuilder result = new StringBuilder();
+        for (String word : words) {
+            result.append(new StringBuilder(word).reverse()).append(" ");
+        }
+        return result.toString().trim();
+    }
+}
