@@ -1,0 +1,204 @@
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int gridSize = 3;
+
+        boolean exit = false;
+
+        while (!exit) {
+            MainMenu();
+            int input = UserInput(scanner);
+
+            switch (input) {
+                case 1:
+                    Game(scanner, gridSize);
+                    break;
+                case 2:
+                    gridSize = settingsMenu(scanner, gridSize);
+                    break;
+                case 3:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Некоректний вибір");
+            }
+        }
+
+        scanner.close();
+    }
+
+    public static void MainMenu() {
+        System.out.println("\n__ Головне меню __");
+        System.out.println("1) Грати (нова гра)");
+        System.out.println("2) Налаштування");
+        System.out.println("3) Вихід");
+        System.out.print("Виберіть пункт меню: ");
+    }
+
+    public static int UserInput(Scanner scanner) {
+        int input = -1;
+        if (scanner.hasNextInt()) {
+            input = scanner.nextInt();
+            scanner.nextLine();
+        } else {
+            scanner.nextLine();
+            System.out.println("Некоректний ввід");
+        }
+        return input;
+    }
+
+    public static void printBoard(String[][] gameGrid, int totalRows, int totalCols) {
+        System.out.print("   ");
+        for (int i = 1; i <= totalCols / 2; i++) {
+            System.out.print(" " + i + " ");
+        }
+        System.out.println();
+
+        for (int i = 0; i < totalRows; i++) {
+            if (i % 2 == 0) {
+                continue;
+            }
+            System.out.print((i / 2 + 1) + " ");
+            for (int j = 0; j < totalCols; j++) {
+                System.out.print(gameGrid[i][j]);
+            }
+            System.out.println();
+        }
+    }
+
+    public static void Game(Scanner scanner, int gridSize) {
+        int totalRows = gridSize * 2 + 1;
+        int totalCols = gridSize * 2 + 1;
+        String[][] gameGrid = new String[totalRows][totalCols];
+        boolean isXTurn = true;
+        String currentPlayer;
+
+        Grid(gameGrid, totalRows, totalCols, gridSize);
+
+        while (true) {
+            currentPlayer = isXTurn ? "X" : "O";
+            printBoard(gameGrid, totalRows, totalCols);
+
+            int row, col;
+            while (true) {
+                System.out.print(currentPlayer + " Введіть стовпець (1-" + gridSize + "): ");
+                col = UserInput(scanner) - 1;
+                System.out.print(currentPlayer + " Введіть рядок (1-" + gridSize + "): ");
+                row = UserInput(scanner) - 1;
+
+                if (col < 0 || col >= gridSize || row < 0 || row >= gridSize || !gameGrid[row * 2 + 1][col * 2 + 1].equals(" ")) {
+                    System.out.println("Клітинка зайнята або некоректний ввід");
+                    continue;
+                }
+                break;
+            }
+
+            gameGrid[row * 2 + 1][col * 2 + 1] = currentPlayer;
+            if (checkWin(gameGrid, row, col, currentPlayer, gridSize)) {
+                printBoard(gameGrid, totalRows, totalCols);
+                System.out.println(currentPlayer + " Переміг!");
+                break;
+            }
+
+            isXTurn = !isXTurn;
+        }
+    }
+
+    public static void Grid(String[][] gameGrid, int totalRows, int totalCols, int gridSize) {
+        for (int i = 0; i < totalRows; i++) {
+            for (int j = 0; j < totalCols; j++) {
+                if (i % 2 == 0 && j % 2 == 0) {
+                    gameGrid[i][j] = "+";
+                } else if (i % 2 == 0) {
+                    gameGrid[i][j] = "-";
+                } else if (j % 2 == 0) {
+                    gameGrid[i][j] = "|";
+                } else {
+                    gameGrid[i][j] = " ";
+                }
+            }
+        }
+    }
+
+    public static boolean checkWin(String[][] gameGrid, int row, int col, String player, int gridSize) {
+        int count = 0;
+        for (int i = 0; i < gridSize; i++) {
+            if (gameGrid[row * 2 + 1][i * 2 + 1].equals(player)) {
+                count++;
+            }
+        }
+        if (count == 3) return true;
+
+        count = 0;
+        for (int i = 0; i < gridSize; i++) {
+            if (gameGrid[i * 2 + 1][col * 2 + 1].equals(player)) {
+                count++;
+            }
+        }
+        if (count == 3) return true;
+
+        count = 0;
+        for (int i = 0; i < gridSize; i++) {
+            if (gameGrid[i * 2 + 1][i * 2 + 1].equals(player)) {
+                count++;
+            }
+        }
+        if (count == 3) return true;
+        
+        count = 0;
+        for (int i = 0; i < gridSize; i++) {
+            if (gameGrid[i * 2 + 1][(gridSize - i - 1) * 2 + 1].equals(player)) {
+                count++;
+            }
+        }
+        return count == 3;
+    }
+
+    public static int settingsMenu(Scanner scanner, int gridSize) {
+        boolean settingsMenu = true;
+        while (settingsMenu) {
+            System.out.println("__ Налаштування __");
+            System.out.println("1) Змінити розмір поля");
+            System.out.println("2) Вийти у головне меню");
+            System.out.print("Виберіть пункт меню: ");
+
+            int settingsInput = UserInput(scanner);
+            switch (settingsInput) {
+                case 1:
+                    gridSize = changeSize(scanner);
+                    break;
+                case 2:
+                    settingsMenu = false;
+                    break;
+                default:
+                    System.out.println("Некоректний вибір");
+            }
+        }
+        return gridSize;
+    }
+
+    public static int changeSize(Scanner scanner) {
+        int newSize = 3;
+        boolean validInput = false;
+        while (!validInput) {
+            System.out.print("Введіть розмір поля (3(3х3), 5(5х5), 7(7х7), 9(9x9)): ");
+            if (scanner.hasNextInt()) {
+                int size = scanner.nextInt();
+                scanner.nextLine();
+                if (size == 3 || size == 5 || size == 7 || size == 9) {
+                    newSize = size;
+                    System.out.println("Розмір поля змінено на " + newSize + "x" + newSize);
+                    validInput = true;
+                } else {
+                    System.out.println("Некоректний розмір поля.");
+                }
+            } else {
+                scanner.nextLine();
+                System.out.println("Некоректний ввід");
+            }
+        }
+        return newSize;
+    }
+}
