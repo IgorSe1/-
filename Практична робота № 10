@@ -1,0 +1,35 @@
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args){
+        Scanner scanner = new Scanner(System.in);
+        String[] username = new String[15];
+        String[] password = new String[15];
+        int userCount = 0
+
+        while (true) {
+            System.out.println("1 - Додати користувача");
+            System.out.println("2 - Видалити існуючого користувача");
+            System.out.println("3 - Аутентифікувати користувача");
+            System.out.println("4 - Вихід");
+            int choice = scanner.nextInt();
+            scanner.nextline();
+
+            if (choice == 1) {
+                if (userCount >= 15) {
+                    System.out.println("\n ПОМИЛКА \n Не можна додати більше 15 користувачів!");
+                } else {
+                    System.out.println("Введіть імʼя користувача: ")
+                    String username = scanner.nextline();
+                    if (username.length() < 5 || username.contains(" ")) {
+                        System.out.println("\n ПОМИЛКА \n Імʼя має містити не менше 5 символів і не мати пробілів");
+                    } else {
+                        System.out.print("Введіть пароль: ");
+                        String password = scanner.nextline();
+                        if (password.length() < 10 || password.contains(" ")) {
+                    }
+                }
+            }
+        }
+    }
+}
