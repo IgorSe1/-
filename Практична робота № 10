@@ -1,35 +1,120 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[] username = new String[15];
-        String[] password = new String[15];
-        int userCount = 0
+        String[] usernames = new String[15];
+        String[] passwords = new String[15];
+        int userCount = 0;
 
         while (true) {
-            System.out.println("1 - Додати користувача");
-            System.out.println("2 - Видалити існуючого користувача");
-            System.out.println("3 - Аутентифікувати користувача");
-            System.out.println("4 - Вихід");
-            int choice = scanner.nextInt();
-            scanner.nextline();
+            try {
+                System.out.println("1 - Додати користувача");
+                System.out.println("2 - Видалити користувача");
+                System.out.println("3 - Аутентифікувати користувача");
+                System.out.println("4 - Вихід");
+                System.out.println("\nВведіть пункт меню: ");
+                int choice = scanner.nextInt();
+                scanner.nextLine();
 
-            if (choice == 1) {
-                if (userCount >= 15) {
-                    System.out.println("\n ПОМИЛКА \n Не можна додати більше 15 користувачів!");
-                } else {
-                    System.out.println("Введіть імʼя користувача: ")
-                    String username = scanner.nextline();
-                    if (username.length() < 5 || username.contains(" ")) {
-                        System.out.println("\n ПОМИЛКА \n Імʼя має містити не менше 5 символів і не мати пробілів");
+                if (choice == 1) {
+                    if (userCount >= 15) {
+                        System.out.println("Помилка: не можна додати більше користувачів.");
                     } else {
-                        System.out.print("Введіть пароль: ");
-                        String password = scanner.nextline();
-                        if (password.length() < 10 || password.contains(" ")) {
+                        System.out.print("Введіть ім'я користувача: ");
+                        String username = scanner.nextLine();
+                        if (username.length() < 5 || username.contains(" ")) {
+                            System.out.println("Помилка: ім'я користувача має містити не менше 5 символів і не мати пробілів.");
+                        } else {
+                            System.out.print("Введіть пароль: ");
+                            String password = scanner.nextLine();
+                            if (password.length() < 10 || password.contains(" ")) {
+                                System.out.println("Помилка: пароль має містити не менше 10 символів і не мати пробілів.");
+                            } else {
+                                int digitCount = 0;
+                                boolean hasSpecial = false;
+                                boolean forbiddenWord = false;
+                                String[] forbiddenPasswords = {"admin", "pass", "password", "qwerty", "ytrewq"};
+                                for (char c : password.toCharArray()) {
+                                    if (!Character.isLetterOrDigit(c)) hasSpecial = true;
+                                    if (Character.isDigit(c)) digitCount++;
+                                }
+                                for (String forbidden : forbiddenPasswords) {
+                                    if (password.toLowerCase().indexOf(forbidden) != -1) forbiddenWord = true;
+                                }
+                                if (!hasSpecial || digitCount < 3 || forbiddenWord) {
+                                    System.out.println("Помилка: пароль має містити 3 цифри і спецсимволи.");
+                                } else {
+                                    usernames[userCount] = username;
+                                    passwords[userCount] = password;
+                                    userCount++;
+                                    System.out.println("Користувач зареєстрований ^_^.");
+                                }
+                            }
+                        }
                     }
+                } else if (choice == 2) {
+                    System.out.print("Введіть ім'я користувача для видалення: ");
+                    String username = scanner.nextLine();
+                    boolean found = false;
+                    for (int i = 0; i < userCount; i++) {
+                        if (compareStrings(usernames[i], username)) {
+                            usernames[i] = usernames[userCount - 1];
+                            passwords[i] = passwords[userCount - 1];
+                            usernames[userCount - 1] = null;
+                            passwords[userCount - 1] = null;
+                            userCount--;
+                            System.out.println("Користувач видалений.");
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        System.out.println("Помилка: користувача не знайдено.");
+                    }
+                } else if (choice == 3) {
+                    System.out.print("Введіть ім'я користувача: ");
+                    String username = scanner.nextLine();
+                    System.out.print("Введіть пароль: ");
+                    String password = scanner.nextLine();
+                    boolean authenticated = false;
+                    for (int i = 0; i < userCount; i++) {
+                        if (compareStrings(usernames[i], username) && compareStrings(passwords[i], password)) {
+                            System.out.println("Користувач аутентифікований ^_^.");
+                            authenticated = true;
+                            break;
+                        }
+                    }
+                    if (!authenticated) {
+                        System.out.println("Помилка: неправильне ім'я користувача або пароль.");
+                    }
+                } else if (choice == 4) {
+                    System.out.println("Вихід.");
+                    break;
+                } else {
+                    System.out.println("Невірний вибір. Спробуйте ще раз.");
                 }
+            } catch (InputMismatchException e) {
+                System.out.println("Невірний вибір. Введіть номер пункту.");
+                scanner.nextLine();
             }
         }
+        scanner.close();
+    }
+
+    private static boolean compareStrings(String str1, String str2) {
+        if (str1 == null || str2 == null) {
+            return false;
+        }
+        if (str1.length() != str2.length()) {
+            return false;
+        }
+        for (int i = 0; i < str1.length(); i++) {
+            if (str1.charAt(i) != str2.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
