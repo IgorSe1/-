@@ -1,12 +1,11 @@
 import java.io.FileWriter;
 import java.io.FileReader;
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class TextEditor {
-    private static final String FILE_NAME = "text.txt";
+    private static final String FILE_NAME = "textfile.txt";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -16,9 +15,9 @@ public class TextEditor {
             System.out.println("2. Прочитати увесь вміст файлу");
             System.out.println("3. Вийти з редактора");
             System.out.print("Оберіть опцію: ");
-
+            
             int choice = getValidIntInput(scanner);
-
+            
             switch (choice) {
                 case 1:
                     writeToFile(scanner);
@@ -36,24 +35,25 @@ public class TextEditor {
     }
 
     private static void writeToFile(Scanner scanner) {
+        System.out.println("Оберіть режим запису:");
         System.out.println("1. Додати в кінець файлу");
-        System.out.println("2. Записати або перезаписати файл");
-        System.out.print("Оберіть режим запису: ");
-
+        System.out.println("2. Перезаписати файл");
+        System.out.print("Оберіть опцію: ");
+        
         int mode = getValidIntInput(scanner);
         while (mode != 1 && mode != 2) {
             System.out.print("Некоректний вибір, спробуйте ще раз: ");
             mode = getValidIntInput(scanner);
         }
-
+        
         boolean append = (mode == 1);
-
+        
         System.out.println("Введіть текст для запису у файл:");
         String text = scanner.nextLine();
-
+        
         try (FileWriter writer = new FileWriter(FILE_NAME, append)) {
             writer.write(text + "\n");
-            System.out.println("Текст записаний");
+            System.out.println("Текст успішно записаний!");
         } catch (FileNotFoundException e) {
             System.out.println("Файл не знайдено: " + e.getMessage());
         } catch (IOException e) {
@@ -64,11 +64,12 @@ public class TextEditor {
     }
 
     private static void readFile() {
-        try (FileReader fr = new FileReader(FILE_NAME); BufferedReader br = new BufferedReader(fr)) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
+        try (FileReader fr = new FileReader(FILE_NAME)) {
+            int character;
+            while ((character = fr.read()) != -1) {
+                System.out.print((char) character);
             }
+            System.out.println();
         } catch (FileNotFoundException e) {
             System.out.println("Файл не знайдено.");
         } catch (IOException e) {
@@ -80,11 +81,11 @@ public class TextEditor {
 
     private static int getValidIntInput(Scanner scanner) {
         while (!scanner.hasNextInt()) {
-            System.out.print("Треба ввести число: ");
+            System.out.print("Некоректне введення. Введіть число: ");
             scanner.next();
         }
         int input = scanner.nextInt();
-        scanner.nextLine();
+        scanner.nextLine(); // очистка буфера
         return input;
     }
 }
