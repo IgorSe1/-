@@ -37,7 +37,7 @@ public class TextEditor {
     private static void writeToFile(Scanner scanner) {
         System.out.println("Оберіть режим запису:");
         System.out.println("1. Додати в кінець файлу");
-        System.out.println("2. Перезаписати файл");
+        System.out.println("2. Записати або перезаписати файл");
         System.out.print("Оберіть опцію: ");
         
         int mode = getValidIntInput(scanner);
