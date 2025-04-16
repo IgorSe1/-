@@ -43,3 +43,129 @@ public class TextEditor {
             }
         }
     }
+
+    private static void writeToFile(Scanner scanner) {
+        System.out.println("Оберіть режим запису:");
+        System.out.println("1. Додати в кінець файлу");
+        System.out.println("2. Записати або перезаписати файл");
+        System.out.print("Оберіть опцію: ");
+
+        int mode = getValidIntInput(scanner);
+        while (mode != 1 && mode != 2) {
+            System.out.print("Некоректний вибір, спробуйте ще раз: ");
+            mode = getValidIntInput(scanner);
+        }
+
+        boolean append = (mode == 1);
+
+        System.out.println("Введіть текст для запису (порожній рядок — завершення):");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, append))) {
+            int lineNumber = countLines();
+            while (true) {
+                System.out.print((lineNumber + 1) + ": ");
+                String line = scanner.nextLine();
+                if (line.isEmpty()) break;
+                writer.write(line);
+                writer.newLine();
+                lineNumber++;
+            }
+            System.out.println("Текст успішно записаний!");
+        } catch (IOException e) {
+            System.out.println("Помилка запису до файлу: " + e.getMessage());
+        }
+    }
+
+    private static void readFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            int lineNumber = 1;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(lineNumber + ": " + line);
+                lineNumber++;
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Файл не знайдено.");
+        } catch (IOException e) {
+            System.out.println("Помилка читання файлу: " + e.getMessage());
+        }
+    }
+
+    private static void printLinesInRange(Scanner scanner) {
+        System.out.print("Початковий рядок: ");
+        int start = getValidIntInput(scanner);
+        System.out.print("Кінцевий рядок: ");
+        int end = getValidIntInput(scanner);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            int lineNumber = 1;
+            while ((line = reader.readLine()) != null) {
+                if (lineNumber >= start && lineNumber <= end) {
+                    System.out.println(lineNumber + ": " + line);
+                }
+                lineNumber++;
+            }
+        } catch (IOException e) {
+            System.out.println("Помилка читання файлу: " + e.getMessage());
+        }
+    }
+
+    private static void writeToSpecificLine(Scanner scanner) {
+        System.out.print("Введіть номер рядка для вставки: ");
+        int targetLine = getValidIntInput(scanner);
+        System.out.println("Введіть текст для вставки в рядок " + targetLine + ": ");
+        String text = scanner.nextLine();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String[] lines = new String[1000];
+            int count = 0;
+            String line;
+            while ((line = reader.readLine()) != null && count < lines.length) {
+                lines[count++] = line;
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+                for (int i = 0; i < count; i++) {
+                    if (i + 1 == targetLine) {
+                        writer.write(text);
+                        writer.newLine();
+                    }
+                    writer.write(lines[i]);
+                    writer.newLine();
+                }
+                if (targetLine > count) {
+                    for (int i = count + 1; i < targetLine; i++) {
+                        writer.newLine();
+                    }
+                    writer.write(text);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Помилка обробки файлу: " + e.getMessage());
+        }
+    }
+
+    private static int countLines() {
+        int count = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            while (reader.readLine() != null) {
+                count++;
+            }
+        } catch (IOException e) {
+            // ігноруємо, якщо файл не знайдено
+        }
+        return count;
+    }
+
+    private static int getValidIntInput(Scanner scanner) {
+        while (!scanner.hasNextInt()) {
+            System.out.print("Некоректне введення. Введіть число: ");
+            scanner.next();
+        }
+        int input = scanner.nextInt();
+        scanner.nextLine(); // очистка буфера
+        return input;
+    }
+}
