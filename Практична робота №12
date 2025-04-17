@@ -72,7 +72,7 @@ public class TextEditor {
             }
             System.out.println("Текст успішно записаний!");
         } catch (IOException e) {
-            System.out.println("Помилка запису до файлу: " + e.getMessage());
+            System.out.println("Помилка обробки файлу.");
         }
     }
 
@@ -85,9 +85,9 @@ public class TextEditor {
                 lineNumber++;
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Файл не знайдено.");
+            System.out.println("Помилка обробки файлу.");
         } catch (IOException e) {
-            System.out.println("Помилка читання файлу: " + e.getMessage());
+            System.out.println("Помилка обробки файлу.");
         }
     }
 
@@ -97,17 +97,29 @@ public class TextEditor {
         System.out.print("Кінцевий рядок: ");
         int end = getValidIntInput(scanner);
 
+        if (start > end || start < 1) {
+            System.out.println("Некоректний діапазон.");
+            return;
+        }
+
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             int lineNumber = 1;
+            boolean found = false;
+
             while ((line = reader.readLine()) != null) {
                 if (lineNumber >= start && lineNumber <= end) {
                     System.out.println(lineNumber + ": " + line);
+                    found = true;
                 }
                 lineNumber++;
             }
+
+            if (!found) {
+                System.out.println("У вказаному діапазоні немає рядків.");
+            }
         } catch (IOException e) {
-            System.out.println("Помилка читання файлу: " + e.getMessage());
+            System.out.println("Помилка обробки файлу.");
         }
     }
 
@@ -143,7 +155,7 @@ public class TextEditor {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Помилка обробки файлу: " + e.getMessage());
+            System.out.println("Помилка обробки файлу.");
         }
     }
 
@@ -154,7 +166,6 @@ public class TextEditor {
                 count++;
             }
         } catch (IOException e) {
-            // ігноруємо, якщо файл не знайдено
         }
         return count;
     }
@@ -165,7 +176,7 @@ public class TextEditor {
             scanner.next();
         }
         int input = scanner.nextInt();
-        scanner.nextLine(); // очистка буфера
+        scanner.nextLine();
         return input;
     }
 }
