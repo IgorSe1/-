@@ -1,0 +1,30 @@
+import java.io.*;
+import java.util.*;
+import java.time.*;
+import java.time.format.*;
+
+public class date {
+    private static final int MAX_ENTRIES = 50;
+    private static String[] entries = new String[MAX_ENTRIES];
+    private static LocalDate[] dates = new LocalDate[MAX_ENTRIES];
+    private static int entryCount = 0;
+    private static DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
+        System.out.println("Оберіть опцію:");
+        System.out.println("1. Створити новий щоденник");
+        System.out.println("2. Завантажити існуючий щоденник");
+        int choice = getValidIntInput(scanner);
+        if (choice == 2) {
+            loadDiary(scanner);
+        }
+        while (running) {
+            System.out.println("Меню:");
+            System.out.println("1. Додати запис");
+            System.out.println("2. Видалити запис за датою");
+            System.out.println("3. Переглянути усі записи");
+            System.out.println("4. Змінити формат дати");
+            System.out.println("5. Вийти");
+            System.out.print("Оберіть опцію: ");        
