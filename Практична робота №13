@@ -1,13 +1,13 @@
+import java.io.*;
 import java.util.Scanner;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
-public class main {
+public class Main {
     private static final int MAX_ENTRIES = 50;
-    private static String[] dates = new String[MAX_ENTRIES];
+    private static int[] years = new int[MAX_ENTRIES];
+    private static int[] months = new int[MAX_ENTRIES];
+    private static int[] days = new int[MAX_ENTRIES];
     private static String[] entries = new String[MAX_ENTRIES];
-    private static int entryCount = 0;
+    private static int count = 0;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -15,106 +15,121 @@ public class main {
             System.out.println("Меню:");
             System.out.println("1. Додати запис");
             System.out.println("2. Видалити запис за датою");
-            System.out.println("3. Переглянути усі записи");
+            System.out.println("3. Переглянути всі записи");
             System.out.println("4. Вийти");
             System.out.print("Оберіть опцію: ");
 
-            int choice = getValidIntInput(scanner);
-
-            switch (choice) {
-                case 1:
-                    add(scanner);
-                    break;
-                case 2:
-                    delete(scanner);
-                    break;
-                case 3:
-                    list();
-                    break;
-                case 4:
-                    System.out.println("Вихід...");
-                    return;
-                default:
-                    System.out.println("Некоректний вибір, спробуйте ще раз.");
-            }
+            int choice = getValidInt(scanner);
+            if (choice == 1) addEntry(scanner);
+            else if (choice == 2) deleteEntry(scanner);
+            else if (choice == 3) viewEntries();
+            else if (choice == 4) {
+                System.out.print("Зберегти щоденник у файл? (так/ні): ");
+                String ans = scanner.nextLine();
+                if (ans.equalsIgnoreCase("так")) {
+                    System.out.print("Введіть ім'я файлу: ");
+                    String filename = scanner.nextLine();
+                    saveToFile(filename);
+                }
+                break;
+            } else System.out.println("Невірний вибір.");
         }
     }
 
-    private static void add(Scanner scanner) {
-        if (entryCount >= MAX_ENTRIES) {
-            System.out.println("Щоденник заповнено.");
+    private static void addEntry(Scanner scanner) {
+        if (count >= MAX_ENTRIES) {
+            System.out.println("Досягнуто максимуму записів.");
             return;
         }
 
-        System.out.print("Введіть дату (рррр-мм-дд): ");
-        String dateStr = scanner.nextLine();
-        LocalDate date;
-        try {
-            date = LocalDate.parse(dateStr);
-        } catch (DateTimeParseException e) {
-            System.out.println("Невірний формат дати.");
-            return;
-        }
+        System.out.print("Введіть рік: ");
+        int year = getValidInt(scanner);
+        System.out.print("Введіть місяць: ");
+        int month = getValidInt(scanner);
+        System.out.print("Введіть день: ");
+        int day = getValidInt(scanner);
 
-        String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-        System.out.println("Введіть запис (порожній рядок — завершення):");
-        String text = "";
+        System.out.println("Введіть текст запису (порожній рядок — завершення):");
+        String entry = "";
         while (true) {
             String line = scanner.nextLine();
             if (line.isEmpty()) break;
-            text += line + "\n";
+            entry += line + "\n";
         }
 
-        dates[entryCount] = formattedDate;
-        entries[entryCount] = text;
-        entryCount++;
+        years[count] = year;
+        months[count] = month;
+        days[count] = day;
+        entries[count] = entry;
+        count++;
+
         System.out.println("Запис додано.");
     }
 
-    private static void delete(Scanner scanner) {
-        System.out.print("Введіть дату запису для видалення (рррр-мм-дд): ");
-        String dateStr = scanner.nextLine();
-        int index = -1;
-        for (int i = 0; i < entryCount; i++) {
-            if (dates[i].equals(dateStr)) {
-                index = i;
-                break;
+    private static void deleteEntry(Scanner scanner) {
+        System.out.print("Введіть рік: ");
+        int year = getValidInt(scanner);
+        System.out.print("Введіть місяць: ");
+        int month = getValidInt(scanner);
+        System.out.print("Введіть день: ");
+        int day = getValidInt(scanner);
+
+        for (int i = 0; i < count; i++) {
+            if (years[i] == year && months[i] == month && days[i] == day) {
+                for (int j = i; j < count - 1; j++) {
+                    years[j] = years[j + 1];
+                    months[j] = months[j + 1];
+                    days[j] = days[j + 1];
+                    entries[j] = entries[j + 1];
+                }
+                count--;
+                System.out.println("Запис видалено.");
+                return;
             }
         }
-
-        if (index == -1) {
-            System.out.println("Запис не знайдено.");
-            return;
-        }
-
-        for (int i = index; i < entryCount - 1; i++) {
-            dates[i] = dates[i + 1];
-            entries[i] = entries[i + 1];
-        }
-        entryCount--;
-        System.out.println("Запис видалено.");
+        System.out.println("Запис не знайдено.");
     }
 
-    private static void list() {
-        if (entryCount == 0) {
+    private static void viewEntries() {
+        if (count == 0) {
             System.out.println("Немає записів.");
             return;
         }
-        for (int i = 0; i < entryCount; i++) {
-            System.out.println("Дата: " + dates[i]);
-            System.out.println("Запис:");
+
+        for (int i = 0; i < count; i++) {
+            System.out.println(years[i] + "-" + formatNum(months[i]) + "-" + formatNum(days[i]));
             System.out.println(entries[i]);
         }
     }
 
-    private static int getValidIntInput(Scanner scanner) {
+    private static void saveToFile(String filename) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+            for (int i = 0; i < count; i++) {
+                writer.write(years[i] + "-" + formatNum(months[i]) + "-" + formatNum(days[i]));
+                writer.newLine();
+                writer.write(entries[i]);
+                writer.newLine();
+            }
+            writer.close();
+            System.out.println("Щоденник збережено.");
+        } catch (IOException e) {
+            System.out.println("Помилка збереження: " + e.getMessage());
+        }
+    }
+
+    private static int getValidInt(Scanner scanner) {
         while (!scanner.hasNextInt()) {
-            System.out.print("Некоректне введення. Введіть число: ");
+            System.out.print("Некоректне число. Спробуйте ще раз: ");
             scanner.next();
         }
-        int input = scanner.nextInt();
+        int number = scanner.nextInt();
         scanner.nextLine();
-        return input;
+        return number;
+    }
+
+    private static String formatNum(int n) {
+        if (n < 10) return "0" + n;
+        return "" + n;
     }
 }
