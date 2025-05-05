@@ -1,14 +1,14 @@
 import java.io.*;
 import java.util.*;
-import java.time.*;
-import java.time.format.*;
 
 public class main {
     private static final int MAX_ENTRIES = 50;
     private static String[] entries = new String[MAX_ENTRIES];
-    private static LocalDate[] dates = new LocalDate[MAX_ENTRIES];
+    private static int[] years = new int[MAX_ENTRIES];
+    private static int[] months = new int[MAX_ENTRIES];
+    private static int[] days = new int[MAX_ENTRIES];
     private static int entryCount = 0;
-    private static DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static String dateFormat = "yyyy-MM-dd";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -57,47 +57,49 @@ public class main {
             System.out.println("Досягнуто максимальної кількості записів.");
             return;
         }
-        System.out.print("Введіть дату запису (yyyy-MM-dd): ");
-        String dateInput = scanner.nextLine();
-        try {
-            LocalDate date = LocalDate.parse(dateInput);
-            System.out.println("Введіть текст запису (порожній рядок — завершення):");
-            StringBuilder text = new StringBuilder();
-            while (true) {
-                String line = scanner.nextLine();
-                if (line.isEmpty()) break;
-                text.append(line).append("\n");
-            }
-            entries[entryCount] = text.toString().trim();
-            dates[entryCount] = date;
-            entryCount++;
-            System.out.println("Запис додано.");
-        } catch (Exception e) {
-            System.out.println("Помилка введення дати.");
+        System.out.print("Введіть рік: ");
+        int year = getValidIntInput(scanner);
+        System.out.print("Введіть місяць: ");
+        int month = getValidIntInput(scanner);
+        System.out.print("Введіть день: ");
+        int day = getValidIntInput(scanner);
+
+        System.out.println("Введіть текст запису (порожній рядок — завершення):");
+        String entry = "";
+        while (true) {
+            String line = scanner.nextLine();
+            if (line.isEmpty()) break;
+            entry += line + "\n";
         }
+        years[entryCount] = year;
+        months[entryCount] = month;
+        days[entryCount] = day;
+        entries[entryCount] = entry.trim();
+        entryCount++;
+        System.out.println("Запис додано.");
     }
 
     private static void deleteEntry(Scanner scanner) {
-        System.out.print("Введіть дату запису для видалення (yyyy-MM-dd): ");
-        String dateInput = scanner.nextLine();
-        try {
-            LocalDate date = LocalDate.parse(dateInput);
-            int index = findEntryByDate(date);
-            if (index == -1) {
-                System.out.println("Запис не знайдено.");
-                return;
-            }
-            for (int i = index; i < entryCount - 1; i++) {
-                entries[i] = entries[i + 1];
-                dates[i] = dates[i + 1];
-            }
-            entries[entryCount - 1] = null;
-            dates[entryCount - 1] = null;
-            entryCount--;
-            System.out.println("Запис видалено.");
-        } catch (Exception e) {
-            System.out.println("Некоректне введення.");
+        System.out.print("Введіть рік: ");
+        int year = getValidIntInput(scanner);
+        System.out.print("Введіть місяць: ");
+        int month = getValidIntInput(scanner);
+        System.out.print("Введіть день: ");
+        int day = getValidIntInput(scanner);
+
+        int index = findEntryByDate(year, month, day);
+        if (index == -1) {
+            System.out.println("Запис не знайдено.");
+            return;
         }
+        for (int i = index; i < entryCount - 1; i++) {
+            years[i] = years[i + 1];
+            months[i] = months[i + 1];
+            days[i] = days[i + 1];
+            entries[i] = entries[i + 1];
+        }
+        entryCount--;
+        System.out.println("Запис видалено.");
     }
 
     private static void viewEntries() {
@@ -106,21 +108,18 @@ public class main {
             return;
         }
         for (int i = 0; i < entryCount; i++) {
-            System.out.println(dates[i].format(displayFormatter));
+            String formattedDate = String.format("%04d-%02d-%02d", years[i], months[i], days[i]);
+            System.out.println(formattedDate);
             System.out.println(entries[i]);
             System.out.println();
         }
     }
 
     private static void changeDateFormat(Scanner scanner) {
-        System.out.print("Введіть новий формат дати (наприклад, dd.MM.yyyy): ");
+        System.out.print("Введіть новий формат дати (напр., yyyy-MM-dd): ");
         String format = scanner.nextLine();
-        try {
-            displayFormatter = DateTimeFormatter.ofPattern(format);
-            System.out.println("Формат дати змінено.");
-        } catch (Exception e) {
-            System.out.println("Некоректне введення.");
-        }
+        dateFormat = format;
+        System.out.println("Формат дати змінено.");
     }
 
     private static void exitAndSave(Scanner scanner) {
@@ -137,7 +136,8 @@ public class main {
     private static void saveDiary(String path) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             for (int i = 0; i < entryCount; i++) {
-                writer.write(dates[i].toString());
+                String date = String.format("%04d-%02d-%02d", years[i], months[i], days[i]);
+                writer.write(date);
                 writer.newLine();
                 writer.write(entries[i]);
                 writer.newLine();
@@ -156,13 +156,18 @@ public class main {
             String line;
             while ((line = reader.readLine()) != null && entryCount < MAX_ENTRIES) {
                 if (line.trim().isEmpty()) continue;
-                LocalDate date = LocalDate.parse(line.trim());
-                StringBuilder text = new StringBuilder();
+                String[] parts = line.trim().split("-");
+                int year = Integer.parseInt(parts[0]);
+                int month = Integer.parseInt(parts[1]);
+                int day = Integer.parseInt(parts[2]);
+                String entry = "";
                 while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
-                    text.append(line).append("\n");
+                    entry += line + "\n";
                 }
-                dates[entryCount] = date;
-                entries[entryCount] = text.toString().trim();
+                years[entryCount] = year;
+                months[entryCount] = month;
+                days[entryCount] = day;
+                entries[entryCount] = entry.trim();
                 entryCount++;
             }
             System.out.println("Щоденник завантажено.");
@@ -173,9 +178,9 @@ public class main {
         }
     }
 
-    private static int findEntryByDate(LocalDate date) {
+    private static int findEntryByDate(int year, int month, int day) {
         for (int i = 0; i < entryCount; i++) {
-            if (dates[i].equals(date)) {
+            if (years[i] == year && months[i] == month && days[i] == day) {
                 return i;
             }
         }
