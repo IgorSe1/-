@@ -1,0 +1,322 @@
+import java.util.Scanner;
+import java.io.*;
+
+public class Main {
+    static int gridSize = 3;
+    static String playerX = "X";
+    static String playerO = "O";
+    static final String CONFIG_FILE = "config.txt";
+    static final String STATS_FILE = "stats.txt";
+    static String[] gameTimes = new String[100];
+    static String[] gameDays = new String[100];
+    static String[] gameMonths = new String[100];
+    static String[] gameYears = new String[100];
+    static int gameIndex = 0;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        loadConfig();
+        boolean exit = false;
+
+        while (!exit) {
+            System.out.println("\n__ Головне меню __");
+            System.out.println("1) Грати (нова гра)");
+            System.out.println("2) Налаштування");
+            System.out.println("3) Переглянути статистику попередніх матчів");
+            System.out.println("4) Вихід");
+            System.out.print("Оберіть пункт меню: ");
+
+            if (scanner.hasNextInt()) {
+                int input = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (input) {
+                    case 1:
+                        playGame(scanner);
+                        break;
+                    case 2:
+                        settingsMenu(scanner);
+                        break;
+                    case 3:
+                        loadStats();
+                        break;
+                    case 4:
+                        saveConfig();
+                        exit = true;
+                        break;
+                    default:
+                        System.out.println("Такого пункту немає :(");
+                }
+            } else {
+                scanner.nextLine();
+                System.out.println("Некоректний ввід x_x");
+            }
+        }
+
+        scanner.close();
+    }
+
+    static void playGame(Scanner scanner) {
+        long millis = System.currentTimeMillis();
+        long totalSeconds = millis / 1000;
+        long totalMinutes = totalSeconds / 60;
+        long totalHours = totalMinutes / 60;
+        long totalDays = totalHours / 24;
+
+        int timezoneOffsetHours = 3;
+        int currentHour = (int) ((totalHours + timezoneOffsetHours) % 24);
+        int currentMinute = (int) (totalMinutes % 60);
+
+        int daysSinceEpoch = (int) totalDays;
+        int year = 1970;
+
+        while (true) {
+            boolean leap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+            int daysInYear = leap ? 366 : 365;
+            if (daysSinceEpoch >= daysInYear) {
+                daysSinceEpoch -= daysInYear;
+                year++;
+            } else {
+                break;
+            }
+        }
+
+        int[] monthDays = {31,28,31,30,31,30,31,31,30,31,30,31};
+        if ((year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))) {
+            monthDays[1] = 29;
+        }
+
+        int month = 0;
+        while (daysSinceEpoch >= monthDays[month]) {
+            daysSinceEpoch -= monthDays[month];
+            month++;
+        }
+        int day = daysSinceEpoch + 1;
+
+        String formattedTime = String.format("%02d:%02d", currentHour, currentMinute);
+        String formattedDay = String.format("%02d", day);
+        String formattedMonth = String.format("%02d", month + 1);
+        String formattedYear = String.format("%04d", year);
+
+        gameTimes[gameIndex] = formattedTime;
+        gameDays[gameIndex] = formattedDay;
+        gameMonths[gameIndex] = formattedMonth;
+        gameYears[gameIndex] = formattedYear;
+
+        int totalRows = gridSize * 2 + 1;
+        int totalCols = gridSize * 2 + 1;
+        String[][] gameGrid = new String[totalRows][totalCols];
+        boolean isXTurn = true;
+        String currentPlayer;
+
+        for (int i = 0; i < totalRows; i++) {
+            for (int j = 0; j < totalCols; j++) {
+                if (i == 0 || i == totalRows - 1) {
+                    gameGrid[i][j] = " ";
+                } else if (i % 2 == 0 && j % 2 == 0) {
+                    gameGrid[i][j] = "+";
+                } else if (i % 2 == 0) {
+                    gameGrid[i][j] = "-";
+                } else if (j % 2 == 0) {
+                    gameGrid[i][j] = "|";
+                } else {
+                    gameGrid[i][j] = " ";
+                }
+            }
+        }
+
+        for (int i = 1; i < totalCols; i += 2) {
+            gameGrid[0][i] = Integer.toString(i / 2 + 1);
+        }
+        for (int i = 1; i < totalRows; i += 2) {
+            gameGrid[i][0] = Integer.toString(i / 2 + 1);
+        }
+
+        while (true) {
+            currentPlayer = isXTurn ? "X" : "O";
+            String playerName = isXTurn ? playerX : playerO;
+
+            for (int i = 0; i < totalRows; i++) {
+                for (int j = 0; j < totalCols; j++) {
+                    System.out.print(gameGrid[i][j]);
+                }
+                System.out.println();
+            }
+
+            int row, col;
+            while (true) {
+                System.out.print("Гравець " + playerName + " введіть стовпець (1-" + gridSize + "): ");
+                if (scanner.hasNextInt()) {
+                    col = scanner.nextInt() - 1;
+                } else {
+                    System.out.println("Некоректний ввід #_#");
+                    scanner.next();
+                    continue;
+                }
+
+                System.out.print("Гравець " + playerName + " введіть рядок ---> (1-" + gridSize + "): ");
+                if (scanner.hasNextInt()) {
+                    row = scanner.nextInt() - 1;
+                } else {
+                    System.out.println("Некоректний ввід X_X");
+                    scanner.next();
+                    continue;
+                }
+
+                if (col < 0 || col >= gridSize || row < 0 || row >= gridSize || gameGrid[row * 2 + 1][col * 2 + 1].equals("X") || gameGrid[row * 2 + 1][col * 2 + 1].equals("O")) {
+                    System.out.println("Клітинка зайнята або некоректний ввід >_<");
+                    continue;
+                }
+                break;
+            }
+
+            gameGrid[row * 2 + 1][col * 2 + 1] = currentPlayer;
+
+            boolean win = checkWin(gameGrid);
+            boolean full = checkFull(gameGrid);
+
+            if (win || full) {
+                for (int i = 0; i < totalRows; i++) {
+                    for (int j = 0; j < totalCols; j++) {
+                        System.out.print(gameGrid[i][j]);
+                    }
+                    System.out.println();
+                }
+            }
+
+            if (win) {
+                System.out.println("Переміг :) " + playerName + " (" + currentPlayer + ")");
+                saveStats(playerName, currentPlayer);
+                break;
+            }
+
+            if (full) {
+                System.out.println("Нічия (0_0)");
+                saveStats("Нічия", "-");
+                break;
+            }
+
+            isXTurn = !isXTurn;
+        }
+    }
+
+    static boolean checkWin(String[][] gameGrid) {
+        for (int i = 1; i < gameGrid.length; i += 2) {
+            if (gameGrid[i][1].equals(gameGrid[i][3]) && gameGrid[i][3].equals(gameGrid[i][5]) && !gameGrid[i][1].equals(" ")) return true;
+        }
+        for (int j = 1; j < gameGrid[0].length; j += 2) {
+            if (gameGrid[1][j].equals(gameGrid[3][j]) && gameGrid[3][j].equals(gameGrid[5][j]) && !gameGrid[1][j].equals(" ")) return true;
+        }
+        if (gameGrid[1][1].equals(gameGrid[3][3]) && gameGrid[3][3].equals(gameGrid[5][5]) && !gameGrid[1][1].equals(" ")) return true;
+        if (gameGrid[1][5].equals(gameGrid[3][3]) && gameGrid[3][3].equals(gameGrid[5][1]) && !gameGrid[1][5].equals(" ")) return true;
+        return false;
+    }
+
+    static boolean checkFull(String[][] gameGrid) {
+        for (int i = 1; i < gameGrid.length; i += 2) {
+            for (int j = 1; j < gameGrid[0].length; j += 2) {
+                if (gameGrid[i][j].equals(" ")) return false;
+            }
+        }
+        return true;
+    }
+
+    static void saveStats(String winner, String symbol) {
+        try {
+            PrintWriter writer = new PrintWriter(new FileWriter(STATS_FILE, true));
+            writer.println("Переможець: " + winner);
+            writer.println("Символ гравця: " + symbol);
+            writer.println("Розмір поля: " + gridSize);
+            writer.println("Дата гри: " + gameTimes[gameIndex] + "/" + gameDays[gameIndex] + "." + gameMonths[gameIndex] + "." + gameYears[gameIndex]);
+            writer.println();
+            writer.close();
+            gameIndex++;
+        } catch (Exception e) {
+            System.out.println("Помилка збереження статистики XoX");
+        }
+    }
+
+    static void loadStats() {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(STATS_FILE));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            reader.close();
+        } catch (Exception e) {
+            System.out.println("Статистика відсутня або сталася помилка (X_X)");
+        }
+    }
+
+    static void settingsMenu(Scanner scanner) {
+        boolean settings = true;
+        while (settings) {
+            System.out.println("__ Налаштування __");
+            System.out.println("1) Змінити розмір поля");
+            System.out.println("2) Змінити ім'я гравця X");
+            System.out.println("3) Змінити ім'я гравця O");
+            System.out.println("4) Повернутись у головне меню");
+            System.out.print("Виберіть пункт меню: ");
+
+            if (scanner.hasNextInt()) {
+                int input = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (input) {
+                    case 1:
+                        System.out.print("Введіть розмір поля (3, 5, 7, 9): ");
+                        if (scanner.hasNextInt()) {
+                            int size = scanner.nextInt();
+                            scanner.nextLine();
+                            if (size == 3 || size == 5 || size == 7 || size == 9) {
+                                gridSize = size;
+                            } else {
+                                System.out.println("Некоректний розмір -(0_0)-");
+                            }
+                        }
+                        break;
+                    case 2:
+                        System.out.print("Нове ім'я для гравця X: ");
+                        playerX = scanner.nextLine();
+                        break;
+                    case 3:
+                        System.out.print("Нове ім'я для гравця O: ");
+                        playerO = scanner.nextLine();
+                        break;
+                    case 4:
+                        settings = false;
+                        break;
+                    default:
+                        System.out.println("Некоректний вибір x_x");
+                }
+            } else {
+                scanner.nextLine();
+                System.out.println("Некоректний ввід #_#");
+            }
+        }
+    }
+
+    static void saveConfig() {
+        try {
+            PrintWriter writer = new PrintWriter(CONFIG_FILE);
+            writer.println(gridSize);
+            writer.println(playerX);
+            writer.println(playerO);
+            writer.close();
+        } catch (Exception e) {
+            System.out.println("Помилка збереження конфігурації XoX");
+        }
+    }
+
+    static void loadConfig() {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(CONFIG_FILE));
+            gridSize = Integer.parseInt(reader.readLine());
+            playerX = reader.readLine();
+            playerO = reader.readLine();
+            reader.close();
+        } catch (Exception e) {
+        }
+    }
+}
